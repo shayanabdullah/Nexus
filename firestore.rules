@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net catch-all default-deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+
+    function isValidUser(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             data.fullName is string && data.fullName.size() <= 128 &&
+             data.email is string && data.email.size() <= 128 &&
+             data.operatorId is string && data.operatorId.size() <= 64 &&
+             data.createdAt is timestamp &&
+             data.updatedAt is timestamp;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && 
+                      isValidId(userId) &&
+                      isValidUser(incoming()) && 
+                      incoming().userId == request.auth.uid && 
+                      incoming().createdAt == request.time && 
+                      incoming().updatedAt == request.time &&
+                      incoming().keys().hasAll(['userId', 'fullName', 'email', 'operatorId', 'createdAt', 'updatedAt']) && 
+                      incoming().keys().size() == 6;
+      allow update: if isOwner(userId) && 
+                      isValidId(userId) &&
+                      isValidUser(incoming()) && 
+                      incoming().userId == existing().userId && 
+                      incoming().createdAt == existing().createdAt &&
+                      incoming().updatedAt == request.time &&
+                      incoming().diff(existing()).affectedKeys().hasOnly(['fullName', 'operatorId', 'updatedAt']);
+      allow delete: if false;
+    }
+  }
+}

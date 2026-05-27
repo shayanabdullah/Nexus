@@ -1,0 +1,6 @@
+{
+  "name": "NEXUS OS",
+  "description": "An AI operating system for modern teams. Unified workflows, autonomous agents, and contextual memory inside one adaptive interface.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
