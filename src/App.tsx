@@ -4,7 +4,9 @@
  */
 
 import React, { useEffect, useState, useRef } from 'react';
+import gsap from 'gsap';
 import CustomCursor from './components/CustomCursor';
+import GSAPSmoothScroll from './components/GSAPSmoothScroll';
 import Preloader from './components/Preloader';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -40,13 +42,29 @@ export default function App() {
     }
     const targetElement = document.getElementById(elementId);
     if (targetElement) {
-      targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const rect = targetElement.getBoundingClientRect();
+      const targetY = window.scrollY + rect.top;
+
+      // Animate the scroll smoothly using custom GSAP interpolation for absolute harmony
+      const scrollProxy = { y: window.scrollY };
+      gsap.to(scrollProxy, {
+        y: targetY,
+        duration: 1.3,
+        ease: 'power3.out',
+        overwrite: 'auto',
+        onUpdate: () => {
+          window.scrollTo(0, scrollProxy.y);
+        }
+      });
     }
   };
 
   return (
     <div className="relative min-h-screen bg-black text-white overflow-hidden selection:bg-[#5ed29c]/30 selection:text-white">
       
+      {/* Dynamic GSAP smooth cinematic scrolling engine */}
+      <GSAPSmoothScroll />
+
       {/* Precision system cursor layout */}
       <CustomCursor />
 
