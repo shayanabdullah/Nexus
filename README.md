@@ -1,5 +1,5 @@
 # 🌐 Nexus OS — Multi-Agent Executive Workspace
-![Nexus OS Preview](assets/preview.gif)\
+![Nexus OS Preview](assets/preview.gif)
 
 > **A multi-device system unifying autonomous agents, contextual memory pipelines, and enterprise-grade telemetry.**
 
